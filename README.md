@@ -35,7 +35,7 @@ It's built on the same frameworks I apply in my work: DAMA-aligned governance th
 
 - **Backend**: FastAPI (Python) — lightweight, async, easy to deploy
 - **Frontend**: Vanilla HTML/CSS/JS — no build step, loads fast
-- **AI**: Claude API (Haiku model for speed and cost efficiency)
+- **AI**: Groq API with Llama 3.1 (free tier, fast inference)
 - **Deploy**: Render (free tier)
 
 ---
@@ -48,23 +48,30 @@ git clone https://github.com/maitnnguyen/dataready.git
 cd dataready
 ```
 
-**2. Install dependencies**
+**2. Create and activate a virtual environment**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  # Mac/Linux
+.venv\Scripts\activate     # Windows
+```
+
+**3. Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-**3. Set your API key**
+**4. Set your API key**
 ```bash
-export ANTHROPIC_API_KEY=your_key_here
+export GROQ_API_KEY=gsk_your_key_here
 ```
-Get a key at [console.anthropic.com](https://console.anthropic.com)
+Get a free key at [console.groq.com](https://console.groq.com) — no credit card needed.
 
-**4. Start the server**
+**5. Start the server**
 ```bash
 uvicorn main:app --reload
 ```
 
-**5. Open in browser**
+**6. Open in browser**
 ```
 http://localhost:8000
 ```
@@ -78,8 +85,8 @@ http://localhost:8000
 3. Click **New → Web Service** → connect your GitHub repo
 4. Render auto-detects `render.yaml` — just click **Deploy**
 5. Go to **Environment** tab → add variable:
-   - Key: `ANTHROPIC_API_KEY`
-   - Value: your Anthropic API key
+   - Key: `GROQ_API_KEY`
+   - Value: your Groq API key
 6. Your live URL will be `https://dataready-xxxx.onrender.com`
 
 ---
