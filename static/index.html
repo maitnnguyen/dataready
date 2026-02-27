@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataReady — Consulting Discovery Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1410;
+    --paper: #f5f2eb;
+    --green-deep: #2a4a10;
+    --green-mid: #3d6b18;
+    --green-bright: #5a9e2f;
+    --green-pale: #d4e8be;
+    --green-ghost: #eef6e4;
+    --amber: #c47c1a;
+    --amber-pale: #fdf3df;
+    --red-soft: #c0392b;
+    --red-pale: #fdecea;
+    --rule: #c8c0b0;
+    --muted: #6b6457;
+    --mono: 'DM Mono', monospace;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'Outfit', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.5; }
+
+  header { position: relative; z-index: 1; border-bottom: 2px solid var(--ink); padding: 0 48px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { display: flex; align-items: baseline; gap: 10px; }
+  .logo-mark { font-family: var(--serif); font-size: 22px; color: var(--green-deep); letter-spacing: -0.5px; }
+  .logo-tag { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--rule); padding: 2px 7px; border-radius: 2px; }
+  .header-meta { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  .hero { position: relative; z-index: 1; padding: 64px 48px 48px; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: end; }
+  .hero h1 { font-family: var(--serif); font-size: clamp(36px, 5vw, 64px); line-height: 1.05; color: var(--green-deep); letter-spacing: -1px; }
+  .hero h1 em { font-style: italic; color: var(--green-bright); }
+  .hero-desc { font-size: 15px; line-height: 1.7; color: var(--muted); font-weight: 300; max-width: 420px; }
+  .hero-steps { display: flex; flex-direction: column; gap: 12px; }
+  .step { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; background: white; border: 1px solid var(--rule); border-radius: 4px; }
+  .step-num { font-family: var(--mono); font-size: 11px; color: var(--green-bright); font-weight: 500; min-width: 24px; padding-top: 1px; }
+  .step-text { font-size: 13px; line-height: 1.5; color: var(--ink); }
+  .step-text strong { font-weight: 600; }
+
+  main { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 300px); }
+  .input-panel { padding: 40px 48px; border-right: 1px solid var(--rule); display: flex; flex-direction: column; gap: 24px; }
+  .output-panel { padding: 40px 48px; background: white; display: flex; flex-direction: column; }
+
+  .field-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .field-hint { font-size: 12px; color: var(--muted); margin-bottom: 10px; line-height: 1.5; font-weight: 300; }
+  textarea { width: 100%; min-height: 180px; padding: 16px; font-family: var(--sans); font-size: 14px; line-height: 1.6; color: var(--ink); background: white; border: 1.5px solid var(--rule); border-radius: 4px; resize: vertical; outline: none; transition: border-color 0.2s; font-weight: 300; }
+  textarea:focus { border-color: var(--green-bright); }
+  textarea::placeholder { color: #b0a898; }
+
+  .options-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip { font-family: var(--mono); font-size: 11px; padding: 6px 12px; border: 1.5px solid var(--rule); border-radius: 20px; cursor: pointer; color: var(--muted); transition: all 0.15s; background: white; user-select: none; }
+  .chip:hover { border-color: var(--green-bright); color: var(--green-deep); }
+  .chip.active { border-color: var(--green-bright); background: var(--green-ghost); color: var(--green-deep); font-weight: 500; }
+
+  .run-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px 24px; background: var(--green-deep); color: white; border: none; border-radius: 4px; font-family: var(--sans); font-size: 14px; font-weight: 600; letter-spacing: 0.02em; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+  .run-btn:hover { background: var(--green-mid); }
+  .run-btn:active { transform: scale(0.99); }
+  .run-btn:disabled { background: var(--rule); cursor: not-allowed; transform: none; }
+
+  .output-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; }
+  .output-title { font-family: var(--serif); font-size: 20px; color: var(--green-deep); }
+  .output-badge { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 2px; border: 1px solid; }
+  .badge-waiting { color: var(--muted); border-color: var(--rule); background: #f8f6f0; }
+  .badge-running { color: var(--amber); border-color: var(--amber); background: var(--amber-pale); animation: pulse 1.5s infinite; }
+  .badge-done { color: var(--green-mid); border-color: var(--green-bright); background: var(--green-ghost); }
+  .badge-error { color: var(--red-soft); border-color: var(--red-soft); background: var(--red-pale); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 48px 0; opacity: 0.4; }
+  .empty-icon { font-size: 40px; filter: grayscale(1); }
+  .empty-text { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.5; }
+
+  .results { display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .result-card { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .card-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--green-ghost); border-bottom: 1px solid var(--green-pale); }
+  .card-icon { font-size: 14px; }
+  .card-title { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green-deep); font-weight: 500; }
+  .card-body { padding: 16px; font-size: 13.5px; line-height: 1.7; color: var(--ink); font-weight: 300; }
+  .card-body ul { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+
+  .score-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .score-num { font-family: var(--serif); font-size: 42px; color: var(--green-deep); line-height: 1; }
+  .score-label { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .score-bar-track { height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+  .score-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+  .gap-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .gap-tag { font-size: 12px; padding: 5px 11px; border-radius: 2px; background: var(--amber-pale); border: 1px solid #e8c87a; color: #7a4d00; font-family: var(--mono); }
+  .gap-tag.high { background: var(--red-pale); border-color: #e8a0a0; color: var(--red-soft); }
+
+  .next-steps { display: flex; flex-direction: column; gap: 10px; }
+  .next-step { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; background: var(--green-ghost); border-radius: 3px; border-left: 3px solid var(--green-bright); }
+  .ns-num { font-family: var(--mono); font-size: 12px; color: var(--green-bright); font-weight: 500; min-width: 20px; }
+  .ns-text { font-size: 13px; line-height: 1.5; }
+
+  footer { position: relative; z-index: 1; border-top: 1px solid var(--rule); padding: 16px 48px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-note { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.05em; }
+  .footer-author { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+  .footer-author a { color: var(--green-mid); text-decoration: none; }
+  .footer-author a:hover { text-decoration: underline; }
+
+  .loading-dots span { display: inline-block; width: 5px; height: 5px; background: white; border-radius: 50%; margin: 0 2px; animation: bounce 1.2s infinite ease-in-out; }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+
+  @media (max-width: 900px) {
+    header, .hero, footer { padding-left: 24px; padding-right: 24px; }
+    .hero { grid-template-columns: 1fr; }
+    main { grid-template-columns: 1fr; }
+    .input-panel { padding: 32px 24px; border-right: none; border-bottom: 1px solid var(--rule); }
+    .output-panel { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-mark">DataReady</span>
+    <span class="logo-tag">by Mai Nguyen</span>
+  </div>
+  <span class="header-meta">AI-Powered Consulting Discovery</span>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>Turn a business<br>problem into a<br><em>consulting brief.</em></h1>
+    <p class="hero-desc" style="margin-top:20px">Describe any data, AI, or transformation challenge. DataReady maps capability gaps, scores data readiness, and generates structured next steps — the way a senior consultant would.</p>
+  </div>
+  <div class="hero-steps">
+    <div class="step"><span class="step-num">01</span><span class="step-text"><strong>Describe the challenge</strong> — in plain language. No jargon required.</span></div>
+    <div class="step"><span class="step-num">02</span><span class="step-text"><strong>Select focus areas</strong> — data governance, AI readiness, transformation, or all.</span></div>
+    <div class="step"><span class="step-num">03</span><span class="step-text"><strong>Get a structured brief</strong> — gaps, readiness score, and prioritised next steps.</span></div>
+  </div>
+</section>
+
+<main>
+  <div class="input-panel">
+    <div>
+      <div class="field-label">Business Challenge</div>
+      <div class="field-hint">Describe a real or hypothetical scenario — a hospital wanting AI for patient data, a retailer with fragmented systems, a team lacking a governance framework.</div>
+      <textarea id="problemInput" placeholder="e.g. A mid-size hospital network wants to build an AI model to predict patient readmissions, but their data is scattered across 6 legacy systems, there's no unified patient ID, and clinical staff aren't sure who owns the data..."></textarea>
+    </div>
+    <div>
+      <div class="field-label">Focus Areas</div>
+      <div class="options-row" id="focusChips">
+        <div class="chip active" data-val="Data Governance">Data Governance</div>
+        <div class="chip active" data-val="AI Readiness">AI Readiness</div>
+        <div class="chip active" data-val="Data Architecture">Data Architecture</div>
+        <div class="chip active" data-val="Stakeholder & Change">Stakeholder & Change</div>
+        <div class="chip" data-val="Regulatory & Compliance">Regulatory & Compliance</div>
+        <div class="chip" data-val="Data Quality">Data Quality</div>
+      </div>
+    </div>
+    <div>
+      <div class="field-label">Output Depth</div>
+      <div class="options-row" id="depthChips">
+        <div class="chip active" data-val="quick">Quick scan</div>
+        <div class="chip" data-val="full">Full assessment</div>
+      </div>
+    </div>
+    <button class="run-btn" id="runBtn" onclick="runAnalysis()">
+      <span class="btn-icon">⬡</span>
+      <span id="btnText">Run Discovery Analysis</span>
+      <span class="loading-dots" id="loadingDots" style="display:none"><span></span><span></span><span></span></span>
+    </button>
+  </div>
+
+  <div class="output-panel">
+    <div class="output-header">
+      <span class="output-title">Discovery Brief</span>
+      <span class="output-badge badge-waiting" id="statusBadge">Awaiting Input</span>
+    </div>
+    <div id="emptyState" class="empty-state">
+      <div class="empty-icon">◈</div>
+      <div class="empty-text">Your structured consulting brief<br>will appear here</div>
+    </div>
+    <div id="resultsContainer" style="display:none"></div>
+  </div>
+</main>
+
+<footer>
+  <span class="footer-note">Powered by Claude API · For demonstration purposes</span>
+  <span class="footer-author">Built by <a href="https://www.linkedin.com/in/mai-n-347a1331/" target="_blank">Mai Nguyen</a> · <a href="https://github.com/maitnnguyen" target="_blank">GitHub</a></span>
+</footer>
+
+<script>
+  document.querySelectorAll('#focusChips .chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('active'));
+  });
+  document.querySelectorAll('#depthChips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#depthChips .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  function getActiveFocus() {
+    return [...document.querySelectorAll('#focusChips .chip.active')].map(c => c.dataset.val);
+  }
+  function getDepth() {
+    const a = document.querySelector('#depthChips .chip.active');
+    return a ? a.dataset.val : 'quick';
+  }
+  function setStatus(state, text) {
+    const b = document.getElementById('statusBadge');
+    b.className = `output-badge badge-${state}`;
+    b.textContent = text;
+  }
+
+  async function runAnalysis() {
+    const problem = document.getElementById('problemInput').value.trim();
+    if (!problem) {
+      const ta = document.getElementById('problemInput');
+      ta.style.borderColor = '#c0392b';
+      ta.focus();
+      setTimeout(() => ta.style.borderColor = '', 1500);
+      return;
+    }
+
+    const btn = document.getElementById('runBtn');
+    btn.disabled = true;
+    document.getElementById('btnText').style.display = 'none';
+    document.getElementById('loadingDots').style.display = 'inline-flex';
+    setStatus('running', 'Analysing...');
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('resultsContainer').style.display = 'none';
+
+    try {
+      const res = await fetch('/api/analyse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ problem, focus: getActiveFocus(), depth: getDepth() })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || `Server error ${res.status}`);
+      }
+
+      const result = await res.json();
+      renderResults(result);
+      setStatus('done', 'Brief Ready');
+    } catch (e) {
+      setStatus('error', 'Error');
+      const c = document.getElementById('resultsContainer');
+      c.style.display = 'block';
+      c.innerHTML = `<div style="color:#c0392b;font-size:13px;padding:16px;background:#fdecea;border-radius:4px;border:1px solid #e8a0a0">
+        Analysis failed — ${e.message}
+      </div>`;
+    } finally {
+      btn.disabled = false;
+      document.getElementById('btnText').style.display = 'inline';
+      document.getElementById('loadingDots').style.display = 'none';
+    }
+  }
+
+  function scoreColor(s) {
+    if (s <= 3) return '#c0392b';
+    if (s <= 5) return '#c47c1a';
+    if (s <= 7) return '#5a9e2f';
+    return '#2a4a10';
+  }
+
+  function renderResults(r) {
+    const c = document.getElementById('resultsContainer');
+    const color = scoreColor(r.readiness_score);
+    const barW = (r.readiness_score / 10) * 100;
+
+    c.innerHTML = `<div class="results">
+      <div class="result-card">
+        <div class="card-head"><span class="card-icon">◈</span><span class="card-title">Executive Summary</span></div>
+        <div class="card-body">${r.summary}</div>
+      </div>
+      <div class="result-card">
+        <div class="card-head"><span class="card-icon">◎</span><span class="card-title">Data Readiness Score</span></div>
+        <div class="card-body">
+          <div class="score-row">
+            <span class="score-num" style="color:${color}">${r.readiness_score}<span style="font-size:22px;opacity:0.4">/10</span></span>
+            <div><div style="font-weight:600;font-size:14px;color:${color}">${r.readiness_label}</div>
+            <div class="score-label">${r.readiness_rationale}</div></div>
+          </div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:${barW}%;background:${color}"></div></div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="card-head"><span class="card-icon">△</span><span class="card-title">Capability Gaps</span></div>
+        <div class="card-body">
+          <div class="gap-grid" style="margin-bottom:14px">${r.capability_gaps.map(g => `<div class="gap-tag ${g.severity==='high'?'high':''}" title="${g.description}">${g.area}</div>`).join('')}</div>
+          <ul>${r.capability_gaps.map(g => `<li><strong>${g.area}</strong> — ${g.description}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="card-head"><span class="card-icon">→</span><span class="card-title">Recommended Next Steps</span></div>
+        <div class="card-body"><div class="next-steps">${r.next_steps.map(s => `
+          <div class="next-step"><span class="ns-num">${s.priority}</span>
+          <span class="ns-text"><strong>${s.action}</strong><br>
+          <span style="font-size:12px;color:var(--muted)">${s.owner} · ${s.timeframe}</span></span></div>`).join('')}
+        </div></div>
+      </div>
+      <div class="result-card">
+        <div class="card-head"><span class="card-icon">⚑</span><span class="card-title">Governance Flags</span></div>
+        <div class="card-body"><ul>${r.governance_flags.map(f => `<li>${f}</li>`).join('')}</ul></div>
+      </div>
+      <div class="result-card">
+        <div class="card-head"><span class="card-icon">?</span><span class="card-title">Key Questions for Client</span></div>
+        <div class="card-body"><ul>${r.key_questions.map(q => `<li>${q}</li>`).join('')}</ul></div>
+      </div>
+    </div>`;
+
+    c.style.display = 'block';
+  }
+
+  document.getElementById('problemInput').addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'Enter') runAnalysis();
+  });
+</script>
+</body>
+</html>
