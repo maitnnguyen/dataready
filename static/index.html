@@ -3,463 +3,527 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DataReady v2 — SeesamiData Consulting</title>
+<title>DataReady — SeesamiData Consulting</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:       #f7f4ef;
-  --surface:  #ffffff;
-  --surface2: #f0ece4;
-  --border:   rgba(60,50,30,0.10);
-  --text:     #1c1a16;
-  --muted:    #7a7060;
-  --accent:   #b85c38;
-  --accent2:  #4a7c6f;
-  --danger:   #c0392b;
-  --warn:     #c47d1a;
-  --success:  #2e7d5a;
-  --shadow:   0 2px 16px rgba(60,50,30,0.08);
-  --radius:   10px;
-}
+  /* ── Original design variables ── */
+  :root {
+    --ink:          #0f1410;
+    --paper:        #f5f2eb;
+    --green-deep:   #2a4a10;
+    --green-mid:    #3d6b18;
+    --green-bright: #5a9e2f;
+    --green-pale:   #d4e8be;
+    --green-ghost:  #eef6e4;
+    --amber:        #c47c1a;
+    --amber-pale:   #fdf3df;
+    --red-soft:     #c0392b;
+    --red-pale:     #fdecea;
+    --rule:         #c8c0b0;
+    --muted:        #6b6457;
+    --mono:         'DM Mono', monospace;
+    --serif:        'DM Serif Display', serif;
+    --sans:         'Outfit', sans-serif;
+    /* v2 additions */
+    --surface:      #ffffff;
+    --surface2:     #f0ece4;
+    --border:       rgba(60,50,30,0.10);
+    --shadow:       0 2px 16px rgba(60,50,30,0.08);
+    --radius:       10px;
+    --accent:       var(--green-mid);
+    --accent2:      var(--amber);
+  }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Outfit', sans-serif;
-  min-height: 100vh;
-}
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-/* ── Header ── */
-header {
-  padding: 16px 40px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(247,244,239,0.97);
-  position: sticky; top: 0; z-index: 100;
-  backdrop-filter: blur(8px);
-}
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.5;
+  }
 
-.logo-text {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.2rem;
-}
-.logo-text em { color: var(--accent); font-style: italic; }
-.logo-sub { font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+  /* ══════════════════════════════════════════
+     ORIGINAL HERO SECTION — unchanged
+  ══════════════════════════════════════════ */
 
-.header-links { display: flex; gap: 12px; align-items: center; }
-.header-links a {
-  font-size: 0.75rem; color: var(--muted); text-decoration: none;
-  border: 1px solid var(--border); padding: 4px 10px;
-  border-radius: 6px; background: var(--surface);
-  transition: color 0.2s;
-}
-.header-links a:hover { color: var(--accent); }
+  .site-header {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px;
+    border-bottom: 1px solid var(--rule);
+  }
 
-/* ── Layout ── */
-.app {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  min-height: calc(100vh - 57px);
-}
+  .brand {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--green-deep);
+    letter-spacing: -0.01em;
+  }
 
-/* ── Left panel ── */
-.left-panel {
-  border-right: 1px solid var(--border);
-  background: var(--surface);
-  display: flex; flex-direction: column;
-  overflow-y: auto;
-}
+  .brand em { font-style: italic; color: var(--green-bright); }
 
-.panel-section {
-  padding: 24px;
-  border-bottom: 1px solid var(--border);
-}
+  .nav-links {
+    display: flex; gap: 24px; align-items: center;
+  }
 
-.panel-section:last-child { border-bottom: none; flex: 1; }
+  .nav-links a {
+    font-size: 0.8rem; color: var(--muted);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--green-deep); }
 
-.section-label {
-  font-size: 0.65rem; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-}
-.section-label::after {
-  content: ''; flex: 1; height: 1px; background: var(--border);
-}
+  .hero {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+    padding: 72px 48px 60px;
+    border-bottom: 1px solid var(--rule);
+  }
 
-/* Domain pills */
-.domain-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-}
+  .hero-headline {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    line-height: 1.08;
+    color: var(--green-deep);
+    letter-spacing: -0.02em;
+  }
 
-.domain-pill {
-  padding: 10px 12px; border-radius: 8px;
-  border: 1.5px solid var(--border);
-  cursor: pointer; text-align: center;
-  font-size: 0.78rem; font-weight: 500;
-  transition: all 0.2s;
-  background: var(--surface2);
-}
+  .hero-headline em {
+    font-style: italic;
+    color: var(--green-bright);
+  }
 
-.domain-pill:hover { border-color: var(--accent); color: var(--accent); }
-.domain-pill.active {
-  border-color: var(--accent);
-  background: rgba(184,92,56,0.08);
-  color: var(--accent);
-  font-weight: 600;
-}
+  .hero-sub {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 380px;
+  }
 
-.domain-pill .domain-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+  .hero-steps {
+    display: flex; flex-direction: column; gap: 12px;
+  }
 
-/* Textarea */
-textarea {
-  width: 100%; min-height: 120px;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.85rem; line-height: 1.6;
-  padding: 12px; resize: vertical; outline: none;
-  transition: border-color 0.2s;
-}
-textarea:focus { border-color: var(--accent); }
-textarea::placeholder { color: var(--muted); }
+  .step-row {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+  }
 
-/* Focus checkboxes */
-.focus-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 0.7rem; color: var(--green-bright);
+    font-weight: 500; padding-top: 2px; flex-shrink: 0;
+  }
 
-.focus-chip {
-  padding: 5px 12px; border-radius: 20px;
-  border: 1.5px solid var(--border);
-  cursor: pointer; font-size: 0.75rem; font-weight: 500;
-  background: var(--surface2); transition: all 0.15s;
-  user-select: none;
-}
-.focus-chip:hover { border-color: var(--accent2); color: var(--accent2); }
-.focus-chip.selected {
-  border-color: var(--accent2);
-  background: rgba(74,124,111,0.1);
-  color: var(--accent2);
-}
+  .step-text { font-size: 0.85rem; line-height: 1.5; }
+  .step-text strong { color: var(--green-deep); }
 
-/* Depth toggle */
-.depth-toggle {
-  display: flex; gap: 8px;
-}
-.depth-btn {
-  flex: 1; padding: 9px; border-radius: 8px;
-  border: 1.5px solid var(--border);
-  cursor: pointer; font-size: 0.8rem; font-weight: 500;
-  background: var(--surface2); text-align: center;
-  transition: all 0.15s;
-}
-.depth-btn.active {
-  border-color: var(--accent);
-  background: rgba(184,92,56,0.08);
-  color: var(--accent);
-}
+  /* ══════════════════════════════════════════
+     V2 TOOL SECTION — below hero
+  ══════════════════════════════════════════ */
 
-/* Buttons */
-.btn-primary {
-  width: 100%; padding: 12px;
-  background: var(--accent); color: white;
-  border: none; border-radius: 8px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.88rem; font-weight: 600;
-  cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .tool-wrapper {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 380px 1fr;
+    min-height: 70vh;
+    border-top: 1px solid var(--rule);
+  }
 
-.btn-secondary {
-  padding: 7px 14px;
-  background: var(--surface2); color: var(--text);
-  border: 1px solid var(--border); border-radius: 7px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.78rem; font-weight: 500;
-  cursor: pointer; transition: all 0.15s;
-}
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  /* ── Left input panel ── */
+  .left-panel {
+    border-right: 1px solid var(--rule);
+    background: var(--surface);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
 
-/* ── Right panel ── */
-.right-panel {
-  display: flex; flex-direction: column;
-  overflow: hidden;
-}
+  .panel-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--rule);
+  }
 
-/* Result tabs */
-.result-tabs {
-  display: flex; border-bottom: 1px solid var(--border);
-  background: var(--surface); padding: 0 24px;
-  position: sticky; top: 0; z-index: 10;
-}
+  .section-label {
+    font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--rule);
+  }
 
-.rtab {
-  padding: 12px 20px; cursor: pointer;
-  font-size: 0.82rem; font-weight: 500; color: var(--muted);
-  border-bottom: 2px solid transparent; transition: all 0.2s;
-  white-space: nowrap;
-}
-.rtab:hover { color: var(--text); }
-.rtab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  /* Domain pills */
+  .domain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 
-/* Result content */
-.result-content {
-  flex: 1; overflow-y: auto; padding: 28px;
-}
+  .domain-pill {
+    padding: 9px 10px; border-radius: 7px;
+    border: 1.5px solid var(--rule);
+    cursor: pointer; text-align: center;
+    font-size: 0.75rem; font-weight: 500;
+    transition: all 0.15s; background: var(--paper);
+    color: var(--muted);
+  }
+  .domain-pill:hover { border-color: var(--green-mid); color: var(--green-mid); }
+  .domain-pill.active {
+    border-color: var(--green-mid);
+    background: var(--green-ghost);
+    color: var(--green-deep); font-weight: 600;
+  }
+  .domain-pill .domain-icon { font-size: 1.1rem; display: block; margin-bottom: 3px; }
 
-/* Empty state */
-.empty-state {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  height: 100%; gap: 16px; text-align: center;
-  color: var(--muted);
-}
-.empty-icon { font-size: 3rem; opacity: 0.3; }
-.empty-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.4rem; color: var(--text);
-}
-.empty-sub { font-size: 0.85rem; line-height: 1.6; max-width: 340px; }
+  /* Textarea */
+  textarea {
+    width: 100%; min-height: 110px;
+    background: var(--paper);
+    border: 1.5px solid var(--rule);
+    border-radius: 7px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 0.85rem; line-height: 1.6;
+    padding: 10px 12px; resize: vertical; outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--green-mid); }
+  textarea::placeholder { color: var(--muted); }
 
-/* Score card */
-.score-banner {
-  display: flex; align-items: center; gap: 24px;
-  padding: 24px; border-radius: var(--radius);
-  margin-bottom: 24px; border: 1px solid var(--border);
-}
+  /* Focus chips */
+  .focus-grid { display: flex; flex-wrap: wrap; gap: 6px; }
 
-.score-circle {
-  width: 80px; height: 80px; border-radius: 50%;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  border: 3px solid; flex-shrink: 0;
-}
-.score-num {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.6rem; font-weight: 500; line-height: 1;
-}
-.score-denom { font-size: 0.65rem; color: var(--muted); }
+  .focus-chip {
+    padding: 4px 11px; border-radius: 20px;
+    border: 1.5px solid var(--rule);
+    cursor: pointer; font-size: 0.73rem; font-weight: 500;
+    background: var(--paper); color: var(--muted);
+    transition: all 0.15s; user-select: none;
+  }
+  .focus-chip:hover { border-color: var(--green-mid); color: var(--green-mid); }
+  .focus-chip.selected {
+    border-color: var(--green-mid);
+    background: var(--green-ghost);
+    color: var(--green-deep);
+  }
 
-.score-info { flex: 1; }
-.score-label {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.5rem; line-height: 1.1;
-}
-.score-summary {
-  font-size: 0.82rem; color: var(--muted);
-  line-height: 1.6; margin-top: 6px;
-}
+  /* Depth toggle */
+  .depth-toggle { display: flex; gap: 7px; }
+  .depth-btn {
+    flex: 1; padding: 9px; border-radius: 7px;
+    border: 1.5px solid var(--rule);
+    cursor: pointer; font-size: 0.78rem; font-weight: 500;
+    background: var(--paper); text-align: center;
+    transition: all 0.15s; color: var(--muted);
+  }
+  .depth-btn.active {
+    border-color: var(--green-mid);
+    background: var(--green-ghost);
+    color: var(--green-deep);
+  }
 
-/* Maturity radar */
-.maturity-grid {
-  display: grid; grid-template-columns: repeat(5, 1fr);
-  gap: 10px; margin-bottom: 24px;
-}
-.maturity-item {
-  text-align: center; padding: 12px 8px;
-  background: var(--surface2); border-radius: 8px;
-  border: 1px solid var(--border);
-}
-.maturity-val {
-  font-family: 'DM Mono', monospace;
-  font-size: 1.4rem; font-weight: 500; line-height: 1;
-}
-.maturity-label { font-size: 0.65rem; color: var(--muted); margin-top: 4px; }
+  /* Buttons */
+  .btn-primary {
+    width: 100%; padding: 12px;
+    background: var(--green-deep); color: white;
+    border: none; border-radius: 7px;
+    font-family: var(--sans);
+    font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--green-mid); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-/* Section cards */
-.result-section { margin-bottom: 24px; }
+  .btn-secondary {
+    padding: 7px 14px;
+    background: var(--paper); color: var(--ink);
+    border: 1px solid var(--rule); border-radius: 7px;
+    font-family: var(--sans); font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--green-mid); color: var(--green-mid); }
 
-.result-section-title {
-  font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-}
-.result-section-title::after {
-  content: ''; flex: 1; height: 1px; background: var(--border);
-}
+  /* ── Right results panel ── */
+  .right-panel {
+    display: flex; flex-direction: column; overflow: hidden;
+  }
 
-/* Gap / step cards */
-.gap-card, .step-card, .flag-card {
-  padding: 12px 14px; border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface2); margin-bottom: 8px;
-  font-size: 0.82rem;
-}
-.gap-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.gap-area { font-weight: 600; }
-.severity-badge {
-  padding: 2px 8px; border-radius: 10px;
-  font-size: 0.65rem; font-weight: 600;
-}
-.sev-critical { background: rgba(192,57,43,0.12); color: var(--danger); }
-.sev-high     { background: rgba(196,125,26,0.12); color: var(--warn); }
-.sev-medium   { background: rgba(46,125,90,0.12);  color: var(--success); }
+  .result-tabs {
+    display: flex; border-bottom: 1px solid var(--rule);
+    background: var(--surface); padding: 0 24px;
+    position: sticky; top: 0; z-index: 10;
+  }
 
-.gap-desc { color: var(--muted); line-height: 1.5; }
-.gap-impact { font-size: 0.75rem; color: var(--accent); margin-top: 4px; font-style: italic; }
+  .rtab {
+    padding: 12px 18px; cursor: pointer;
+    font-size: 0.8rem; font-weight: 500; color: var(--muted);
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .rtab:hover { color: var(--green-deep); }
+  .rtab.active { color: var(--green-deep); border-bottom-color: var(--green-mid); }
 
-.step-num {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--accent); color: white;
-  font-size: 0.7rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.step-header { display: flex; align-items: flex-start; gap: 10px; }
-.step-action { font-weight: 500; flex: 1; }
-.step-meta { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
-.step-tag {
-  font-size: 0.68rem; padding: 2px 8px; border-radius: 4px;
-  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
-}
+  .result-content { flex: 1; overflow-y: auto; padding: 28px; }
 
-.pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
-.pill {
-  padding: 5px 12px; border-radius: 20px;
-  background: var(--surface2); border: 1px solid var(--border);
-  font-size: 0.78rem; color: var(--text);
-}
+  /* Empty state */
+  .empty-state {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    height: 100%; gap: 14px; text-align: center; color: var(--muted);
+  }
+  .empty-icon { font-size: 2.5rem; opacity: 0.3; }
+  .empty-title {
+    font-family: var(--serif); font-size: 1.3rem; color: var(--ink);
+  }
+  .empty-sub { font-size: 0.82rem; line-height: 1.6; max-width: 300px; }
 
-/* ── Chat panel ── */
-.chat-wrap {
-  display: flex; flex-direction: column; height: 100%;
-}
+  /* Score banner */
+  .score-banner {
+    display: flex; align-items: center; gap: 20px;
+    padding: 20px; border-radius: var(--radius);
+    margin-bottom: 20px; border: 1px solid var(--rule);
+  }
+  .score-circle {
+    width: 72px; height: 72px; border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border: 2.5px solid; flex-shrink: 0;
+  }
+  .score-num {
+    font-family: var(--mono); font-size: 1.5rem;
+    font-weight: 500; line-height: 1;
+  }
+  .score-denom { font-size: 0.6rem; color: var(--muted); }
+  .score-label { font-family: var(--serif); font-size: 1.4rem; line-height: 1.1; }
+  .score-summary { font-size: 0.8rem; color: var(--muted); line-height: 1.6; margin-top: 5px; }
 
-.chat-messages {
-  flex: 1; overflow-y: auto; padding: 20px;
-  display: flex; flex-direction: column; gap: 12px;
-}
+  /* Maturity grid */
+  .maturity-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 8px; margin-bottom: 20px;
+  }
+  .maturity-item {
+    text-align: center; padding: 10px 6px;
+    background: var(--paper); border-radius: 7px;
+    border: 1px solid var(--rule);
+  }
+  .maturity-val { font-family: var(--mono); font-size: 1.3rem; font-weight: 500; line-height: 1; }
+  .maturity-label { font-size: 0.62rem; color: var(--muted); margin-top: 3px; }
 
-.chat-msg {
-  max-width: 80%; padding: 12px 16px;
-  border-radius: 12px; font-size: 0.83rem;
-  line-height: 1.6; animation: fadeUp 0.3s ease;
-}
-.chat-msg.user {
-  background: var(--accent); color: white;
-  align-self: flex-end; border-bottom-right-radius: 4px;
-}
-.chat-msg.assistant {
-  background: var(--surface2); color: var(--text);
-  align-self: flex-start; border-bottom-left-radius: 4px;
-  border: 1px solid var(--border);
-}
+  /* Section */
+  .result-section { margin-bottom: 22px; }
+  .result-section-title {
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .result-section-title::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
 
-.chat-input-wrap {
-  padding: 16px 20px; border-top: 1px solid var(--border);
-  background: var(--surface); display: flex; gap: 10px;
-}
+  /* Cards */
+  .gap-card, .step-card, .flag-card {
+    padding: 11px 14px; border-radius: 7px;
+    border: 1px solid var(--rule);
+    background: var(--paper); margin-bottom: 7px;
+    font-size: 0.8rem;
+  }
+  .gap-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .gap-area { font-weight: 600; color: var(--green-deep); }
+  .severity-badge {
+    padding: 2px 7px; border-radius: 10px;
+    font-size: 0.62rem; font-weight: 600;
+  }
+  .sev-critical { background: var(--red-pale);   color: var(--red-soft); }
+  .sev-high     { background: var(--amber-pale);  color: var(--amber); }
+  .sev-medium   { background: var(--green-ghost); color: var(--green-mid); }
+  .gap-desc { color: var(--muted); line-height: 1.5; }
+  .gap-impact { font-size: 0.72rem; color: var(--amber); margin-top: 3px; font-style: italic; }
 
-.chat-input {
-  flex: 1; padding: 10px 14px;
-  background: var(--surface2); border: 1.5px solid var(--border);
-  border-radius: 8px; color: var(--text);
-  font-family: 'Outfit', sans-serif; font-size: 0.85rem;
-  outline: none; transition: border-color 0.2s;
-}
-.chat-input:focus { border-color: var(--accent); }
+  .step-num-badge {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--green-deep); color: white;
+    font-size: 0.68rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step-header { display: flex; align-items: flex-start; gap: 10px; }
+  .step-action { font-weight: 500; flex: 1; color: var(--ink); }
+  .step-meta { display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+  .step-tag {
+    font-size: 0.65rem; padding: 2px 7px; border-radius: 4px;
+    background: var(--surface); border: 1px solid var(--rule); color: var(--muted);
+  }
 
-.chat-send {
-  padding: 10px 18px;
-  background: var(--accent); color: white;
-  border: none; border-radius: 8px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.85rem; font-weight: 600;
-  cursor: pointer; transition: all 0.15s;
-}
-.chat-send:hover { filter: brightness(1.08); }
-.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+  .pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill {
+    padding: 4px 11px; border-radius: 20px;
+    background: var(--green-ghost); border: 1px solid var(--green-pale);
+    font-size: 0.75rem; color: var(--green-deep);
+  }
 
-/* Suggested questions */
-.suggest-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 20px 12px; }
-.suggest-chip {
-  padding: 5px 12px; border-radius: 20px;
-  border: 1px solid var(--border); background: var(--surface2);
-  font-size: 0.72rem; cursor: pointer; color: var(--muted);
-  transition: all 0.15s;
-}
-.suggest-chip:hover { border-color: var(--accent); color: var(--accent); }
+  /* Chat */
+  .chat-wrap { display: flex; flex-direction: column; height: 100%; }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 20px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .chat-msg {
+    max-width: 80%; padding: 11px 14px;
+    border-radius: 10px; font-size: 0.82rem;
+    line-height: 1.6; animation: fadeUp 0.3s ease;
+  }
+  .chat-msg.user {
+    background: var(--green-deep); color: white;
+    align-self: flex-end; border-bottom-right-radius: 3px;
+  }
+  .chat-msg.assistant {
+    background: var(--surface); color: var(--ink);
+    align-self: flex-start; border-bottom-left-radius: 3px;
+    border: 1px solid var(--rule);
+  }
+  .chat-input-wrap {
+    padding: 14px 20px; border-top: 1px solid var(--rule);
+    background: var(--surface); display: flex; gap: 8px;
+  }
+  .chat-input {
+    flex: 1; padding: 9px 13px;
+    background: var(--paper); border: 1.5px solid var(--rule);
+    border-radius: 7px; color: var(--ink);
+    font-family: var(--sans); font-size: 0.83rem;
+    outline: none; transition: border-color 0.2s;
+  }
+  .chat-input:focus { border-color: var(--green-mid); }
+  .chat-send {
+    padding: 9px 16px;
+    background: var(--green-deep); color: white;
+    border: none; border-radius: 7px;
+    font-family: var(--sans); font-size: 0.83rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .chat-send:hover { background: var(--green-mid); }
+  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Action plan */
-.phase-card {
-  border: 1px solid var(--border); border-radius: var(--radius);
-  overflow: hidden; margin-bottom: 16px;
-}
-.phase-header {
-  padding: 14px 18px; background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 12px;
-}
-.phase-tag {
-  font-size: 0.65rem; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 3px 8px; border-radius: 4px;
-  background: var(--accent); color: white;
-}
-.phase-weeks { font-size: 0.72rem; color: var(--muted); }
-.phase-theme { font-family: 'DM Serif Display', serif; font-size: 1rem; }
-.phase-body { padding: 14px 18px; }
-.action-row {
-  display: flex; gap: 12px; align-items: flex-start;
-  padding: 8px 0; border-bottom: 1px solid var(--border);
-  font-size: 0.8rem;
-}
-.action-row:last-child { border-bottom: none; }
-.action-week {
-  font-family: 'DM Mono', monospace; font-size: 0.7rem;
-  color: var(--muted); width: 70px; flex-shrink: 0; padding-top: 1px;
-}
-.action-text { flex: 1; }
-.action-deliverable { font-size: 0.72rem; color: var(--accent2); margin-top: 2px; }
+  .suggest-chips { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 20px 10px; }
+  .suggest-chip {
+    padding: 4px 11px; border-radius: 20px;
+    border: 1px solid var(--rule); background: var(--paper);
+    font-size: 0.7rem; cursor: pointer; color: var(--muted);
+    transition: all 0.15s;
+  }
+  .suggest-chip:hover { border-color: var(--green-mid); color: var(--green-mid); }
 
-/* Loading */
-.spinner {
-  width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: white; border-radius: 50%;
-  animation: spin 0.6s linear infinite; display: none;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+  /* 90-day plan */
+  .phase-card {
+    border: 1px solid var(--rule); border-radius: var(--radius);
+    overflow: hidden; margin-bottom: 14px;
+  }
+  .phase-header {
+    padding: 12px 16px; background: var(--green-ghost);
+    border-bottom: 1px solid var(--green-pale);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .phase-tag {
+    font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px;
+    background: var(--green-deep); color: white;
+  }
+  .phase-weeks { font-size: 0.7rem; color: var(--muted); }
+  .phase-theme { font-family: var(--serif); font-size: 0.95rem; color: var(--green-deep); }
+  .phase-body { padding: 12px 16px; }
+  .action-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 7px 0; border-bottom: 1px solid var(--rule);
+    font-size: 0.78rem;
+  }
+  .action-row:last-child { border-bottom: none; }
+  .action-week {
+    font-family: var(--mono); font-size: 0.68rem;
+    color: var(--muted); width: 65px; flex-shrink: 0; padding-top: 1px;
+  }
+  .action-text { flex: 1; color: var(--ink); }
+  .action-deliverable { font-size: 0.7rem; color: var(--green-mid); margin-top: 2px; }
 
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  /* Spinner */
+  .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.6s linear infinite; display: none;
+  }
 
-@media (max-width: 900px) {
-  .app { grid-template-columns: 1fr; }
-  .left-panel { border-right: none; border-bottom: 1px solid var(--border); }
-  header { padding: 12px 20px; }
-}
+  @keyframes spin    { to { transform: rotate(360deg); } }
+  @keyframes fadeUp  {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 40px 24px; }
+    .tool-wrapper { grid-template-columns: 1fr; }
+    .left-panel { border-right: none; border-bottom: 1px solid var(--rule); }
+    .site-header { padding: 14px 24px; }
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <div>
-    <div class="logo-text">Data<em>Ready</em> <span style="color:var(--muted);font-size:0.85rem;font-weight:300">— SeesamiData Consulting</span></div>
-    <div class="logo-sub">AI-powered data readiness assessment · Helsinki</div>
-  </div>
-  <div class="header-links">
-    <a href="https://maitnnguyen.github.io" target="_blank">Portfolio ↗</a>
+<!-- ── Original header ── -->
+<header class="site-header">
+  <div class="brand">Data<em>Ready</em></div>
+  <nav class="nav-links">
+    <a href="https://maitnnguyen.github.io" target="_blank">SeesamiData ↗</a>
     <a href="https://dataready.onrender.com/docs" target="_blank">API ↗</a>
-  </div>
+  </nav>
 </header>
 
-<div class="app">
+<!-- ── Original hero section ── -->
+<section class="hero">
+  <div>
+    <h1 class="hero-headline">
+      Turn a business<br>problem into a<br>
+      <em>consulting brief.</em>
+    </h1>
+    <p class="hero-sub">
+      Describe any data, AI, or transformation challenge. DataReady
+      maps capability gaps, scores data readiness, and generates
+      structured next steps — the way a senior consultant would.
+    </p>
+  </div>
+  <div class="hero-steps">
+    <div class="step-row">
+      <span class="step-num">01</span>
+      <div class="step-text"><strong>Describe the challenge</strong> — in plain language. No jargon required.</div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">02</span>
+      <div class="step-text"><strong>Select focus areas</strong> — data governance, AI readiness, transformation, or all.</div>
+    </div>
+    <div class="step-row">
+      <span class="step-num">03</span>
+      <div class="step-text"><strong>Get a structured brief</strong> — gaps, readiness score, and prioritised next steps.</div>
+    </div>
+  </div>
+</section>
 
-  <!-- ── Left panel: Input ── -->
+<!-- ── V2 Tool section ── -->
+<div class="tool-wrapper">
+
+  <!-- Left: Input -->
   <div class="left-panel">
 
-    <!-- Domain -->
     <div class="panel-section">
       <div class="section-label">Domain</div>
       <div class="domain-grid">
@@ -478,18 +542,16 @@ textarea::placeholder { color: var(--muted); }
       </div>
     </div>
 
-    <!-- Problem -->
     <div class="panel-section">
       <div class="section-label">Challenge Description</div>
       <textarea id="problem" placeholder="Describe your data or AI challenge...
 
-Example: We have 5 years of EHR data from 3 hospitals but can't use it for ML because of inconsistent coding, missing values, and no governance framework. We want to build a readmission prediction model but don't know where to start."></textarea>
+Example: We have 5 years of EHR data from 3 hospitals but can't use it for ML because of inconsistent coding, missing values, and no governance framework."></textarea>
     </div>
 
-    <!-- Focus areas -->
     <div class="panel-section">
       <div class="section-label">Focus Areas</div>
-      <div class="focus-grid" id="focus-grid">
+      <div class="focus-grid">
         <div class="focus-chip selected" onclick="toggleFocus(this)">Data Quality</div>
         <div class="focus-chip selected" onclick="toggleFocus(this)">Governance</div>
         <div class="focus-chip" onclick="toggleFocus(this)">Infrastructure</div>
@@ -501,27 +563,28 @@ Example: We have 5 years of EHR data from 3 hospitals but can't use it for ML be
       </div>
     </div>
 
-    <!-- Depth -->
     <div class="panel-section">
       <div class="section-label">Assessment Depth</div>
       <div class="depth-toggle">
         <div class="depth-btn active" data-depth="quick" onclick="selectDepth(this)">
-          ⚡ Quick Scan<br><span style="font-size:0.68rem;font-weight:400;color:var(--muted)">~10 sec · 3 gaps</span>
+          ⚡ Quick Scan<br>
+          <span style="font-size:0.65rem;font-weight:400;color:var(--muted)">~10 sec · 3 gaps</span>
         </div>
         <div class="depth-btn" data-depth="full" onclick="selectDepth(this)">
-          🔬 Full Assessment<br><span style="font-size:0.68rem;font-weight:400;color:var(--muted)">~20 sec · 6 gaps</span>
+          🔬 Full Assessment<br>
+          <span style="font-size:0.65rem;font-weight:400;color:var(--muted)">~20 sec · 6 gaps</span>
         </div>
       </div>
     </div>
 
-    <!-- Submit -->
     <div class="panel-section">
       <button class="btn-primary" onclick="runAnalysis()" id="btn-analyse">
         <span id="btn-text">Run Assessment</span>
         <div class="spinner" id="spinner"></div>
       </button>
       <div style="text-align:center;margin-top:10px">
-        <button class="btn-secondary" onclick="generate90Day()" id="btn-90day" style="display:none">
+        <button class="btn-secondary" onclick="generate90Day()"
+                id="btn-90day" style="display:none">
           📋 Generate 90-Day Plan
         </button>
       </div>
@@ -529,7 +592,7 @@ Example: We have 5 years of EHR data from 3 hospitals but can't use it for ML be
 
   </div>
 
-  <!-- ── Right panel: Results ── -->
+  <!-- Right: Results -->
   <div class="right-panel">
 
     <div class="result-tabs" id="result-tabs" style="display:none">
@@ -541,10 +604,10 @@ Example: We have 5 years of EHR data from 3 hospitals but can't use it for ML be
     </div>
 
     <div class="result-content" id="result-content">
-      <div class="empty-state" id="empty-state">
+      <div class="empty-state">
         <div class="empty-icon">🌱</div>
         <div class="empty-title">Ready to assess</div>
-        <div class="empty-sub">Describe your data challenge, select your domain and focus areas, then run the assessment.</div>
+        <div class="empty-sub">Select your domain, describe your challenge, and run the assessment.</div>
       </div>
     </div>
 
@@ -554,14 +617,14 @@ Example: We have 5 years of EHR data from 3 hospitals but can't use it for ML be
 <script>
 // ── State ─────────────────────────────────────────────────────────────────────
 let state = {
-  domain:    'biopharma',
-  depth:     'quick',
-  analysis:  null,
+  domain:     'biopharma',
+  depth:      'quick',
+  analysis:   null,
   actionPlan: null,
   chatHistory: [],
 }
 
-// ── UI helpers ────────────────────────────────────────────────────────────────
+// ── UI ────────────────────────────────────────────────────────────────────────
 function selectDomain(el) {
   document.querySelectorAll('.domain-pill').forEach(p => p.classList.remove('active'))
   el.classList.add('active')
@@ -574,9 +637,7 @@ function selectDepth(el) {
   state.depth = el.dataset.depth
 }
 
-function toggleFocus(el) {
-  el.classList.toggle('selected')
-}
+function toggleFocus(el) { el.classList.toggle('selected') }
 
 function getSelectedFocus() {
   return [...document.querySelectorAll('.focus-chip.selected')].map(c => c.textContent.trim())
@@ -588,112 +649,93 @@ function switchRTab(tab) {
   renderTab(tab)
 }
 
-function scoreColor(score) {
-  if (score <= 3) return 'var(--danger)'
-  if (score <= 5) return 'var(--warn)'
-  if (score <= 7) return '#c47d1a'
-  return 'var(--success)'
+function scoreColor(s) {
+  if (s <= 3) return 'var(--red-soft)'
+  if (s <= 5) return 'var(--amber)'
+  if (s <= 7) return '#8a7a10'
+  return 'var(--green-mid)'
 }
 
 // ── Analysis ──────────────────────────────────────────────────────────────────
 async function runAnalysis() {
   const problem = document.getElementById('problem').value.trim()
   if (!problem) { alert('Please describe your challenge'); return }
-
   const focus = getSelectedFocus()
   if (!focus.length) { alert('Select at least one focus area'); return }
 
-  const btn    = document.getElementById('btn-analyse')
-  const spin   = document.getElementById('spinner')
-  const txt    = document.getElementById('btn-text')
-  btn.disabled = true
-  spin.style.display = 'block'
-  txt.textContent    = 'Analysing...'
+  const btn = document.getElementById('btn-analyse')
+  const spin = document.getElementById('spinner')
+  const txt  = document.getElementById('btn-text')
+  btn.disabled = true; spin.style.display = 'block'; txt.textContent = 'Analysing...'
 
   try {
     const res = await fetch('/api/analyse', {
-      method:  'POST',
-      headers: {'Content-Type': 'application/json'},
-      body:    JSON.stringify({ problem, focus, depth: state.depth, domain: state.domain })
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ problem, focus, depth: state.depth, domain: state.domain })
     })
     if (!res.ok) throw new Error(await res.text())
     state.analysis    = await res.json()
     state.chatHistory = []
     state.actionPlan  = null
-
     document.getElementById('result-tabs').style.display = 'flex'
     document.getElementById('btn-90day').style.display   = 'inline-block'
     switchRTab('overview')
-  } catch(e) {
-    alert('Error: ' + e.message)
-  } finally {
-    btn.disabled = false
-    spin.style.display = 'none'
-    txt.textContent    = 'Run Assessment'
+  } catch(e) { alert('Error: ' + e.message) }
+  finally {
+    btn.disabled = false; spin.style.display = 'none'; txt.textContent = 'Run Assessment'
   }
 }
 
 // ── 90-Day plan ───────────────────────────────────────────────────────────────
 async function generate90Day() {
   const btn = document.getElementById('btn-90day')
-  btn.textContent  = '⏳ Generating...'
-  btn.disabled     = true
-
+  btn.textContent = '⏳ Generating...'; btn.disabled = true
   try {
     const problem = document.getElementById('problem').value.trim()
     const focus   = getSelectedFocus()
     const res = await fetch('/api/action-plan', {
-      method:  'POST',
-      headers: {'Content-Type': 'application/json'},
-      body:    JSON.stringify({ problem, focus, depth: 'full', domain: state.domain })
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ problem, focus, depth: 'full', domain: state.domain })
     })
     state.actionPlan = await res.json()
     switchRTab('plan')
-  } catch(e) {
-    alert('Error: ' + e.message)
-  } finally {
-    btn.textContent = '📋 Generate 90-Day Plan'
-    btn.disabled    = false
-  }
+  } catch(e) { alert('Error: ' + e.message) }
+  finally { btn.textContent = '📋 Generate 90-Day Plan'; btn.disabled = false }
 }
 
 // ── Render tabs ───────────────────────────────────────────────────────────────
 function renderTab(tab) {
-  const container = document.getElementById('result-content')
+  const c = document.getElementById('result-content')
   if (!state.analysis && tab !== 'chat') {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">Run an assessment first</div></div>'
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-title">Run an assessment first</div></div>'
     return
   }
-
-  if (tab === 'overview')  renderOverview(container)
-  if (tab === 'gaps')      renderGaps(container)
-  if (tab === 'actions')   renderActions(container)
-  if (tab === 'plan')      renderPlan(container)
-  if (tab === 'chat')      renderChat(container)
+  if (tab === 'overview') renderOverview(c)
+  if (tab === 'gaps')     renderGaps(c)
+  if (tab === 'actions')  renderActions(c)
+  if (tab === 'plan')     renderPlan(c)
+  if (tab === 'chat')     renderChat(c)
 }
 
-function renderOverview(container) {
+function renderOverview(c) {
   const a = state.analysis
-  const c = scoreColor(a.readiness_score)
+  const col = scoreColor(a.readiness_score)
   const dims = a.maturity_dimensions || {}
-
   const dimLabels = {
-    data_quality: 'Data Quality', governance: 'Governance',
-    infrastructure: 'Infrastructure', people_process: 'People', analytics_ai: 'Analytics/AI'
+    data_quality:'Data Quality', governance:'Governance',
+    infrastructure:'Infrastructure', people_process:'People', analytics_ai:'Analytics/AI'
   }
-
-  container.innerHTML = `
-    <div class="score-banner" style="background:linear-gradient(135deg,${c}10,var(--surface2))">
-      <div class="score-circle" style="border-color:${c};color:${c}">
+  c.innerHTML = `
+    <div class="score-banner" style="background:linear-gradient(135deg,${col}18,var(--paper))">
+      <div class="score-circle" style="border-color:${col};color:${col}">
         <div class="score-num">${a.readiness_score}</div>
         <div class="score-denom">/10</div>
       </div>
-      <div class="score-info">
-        <div class="score-label" style="color:${c}">${a.readiness_label}</div>
+      <div>
+        <div class="score-label" style="color:${col}">${a.readiness_label}</div>
         <div class="score-summary">${a.readiness_rationale || a.summary}</div>
       </div>
     </div>
-
     ${Object.keys(dims).length ? `
     <div class="result-section">
       <div class="result-section-title">Maturity Dimensions</div>
@@ -701,117 +743,98 @@ function renderOverview(container) {
         ${Object.entries(dims).map(([k,v]) => `
           <div class="maturity-item">
             <div class="maturity-val" style="color:${scoreColor(v)}">${v}</div>
-            <div class="maturity-label">${dimLabels[k] || k}</div>
-          </div>
-        `).join('')}
+            <div class="maturity-label">${dimLabels[k]||k}</div>
+          </div>`).join('')}
       </div>
     </div>` : ''}
-
     <div class="result-section">
       <div class="result-section-title">Executive Summary</div>
-      <p style="font-size:0.85rem;line-height:1.7;color:var(--text)">${a.summary}</p>
+      <p style="font-size:0.84rem;line-height:1.7">${a.summary}</p>
     </div>
-
     ${a.quick_wins?.length ? `
     <div class="result-section">
       <div class="result-section-title">⚡ Quick Wins</div>
-      <div class="pill-list">${a.quick_wins.map(w => `<div class="pill">✓ ${w}</div>`).join('')}</div>
+      <div class="pill-list">${a.quick_wins.map(w=>`<div class="pill">✓ ${w}</div>`).join('')}</div>
     </div>` : ''}
-
     ${a.recommended_tools?.length ? `
     <div class="result-section">
       <div class="result-section-title">Recommended Tools</div>
-      <div class="pill-list">${a.recommended_tools.map(t => `<div class="pill">🔧 ${t}</div>`).join('')}</div>
+      <div class="pill-list">${a.recommended_tools.map(t=>`<div class="pill">🔧 ${t}</div>`).join('')}</div>
     </div>` : ''}
-
     ${a.key_questions?.length ? `
     <div class="result-section">
       <div class="result-section-title">Key Questions for Your Team</div>
-      ${a.key_questions.map((q,i) => `
-        <div class="gap-card" style="margin-bottom:6px">
-          <span style="color:var(--accent);font-weight:600;margin-right:8px">${i+1}.</span>${q}
-        </div>
+      ${a.key_questions.map((q,i)=>`
+        <div class="gap-card"><span style="color:var(--green-bright);font-weight:600;margin-right:6px">${i+1}.</span>${q}</div>
       `).join('')}
     </div>` : ''}
   `
 }
 
-function renderGaps(container) {
+function renderGaps(c) {
   const a = state.analysis
-  container.innerHTML = `
+  c.innerHTML = `
     <div class="result-section">
-      <div class="result-section-title">Capability Gaps (${a.capability_gaps?.length || 0})</div>
-      ${(a.capability_gaps || []).map(g => `
+      <div class="result-section-title">Capability Gaps (${a.capability_gaps?.length||0})</div>
+      ${(a.capability_gaps||[]).map(g=>`
         <div class="gap-card">
           <div class="gap-header">
             <span class="gap-area">${g.area}</span>
             <span class="severity-badge sev-${g.severity}">${g.severity?.toUpperCase()}</span>
           </div>
           <div class="gap-desc">${g.description}</div>
-          ${g.impact ? `<div class="gap-impact">Impact: ${g.impact}</div>` : ''}
-        </div>
-      `).join('')}
+          ${g.impact?`<div class="gap-impact">Impact: ${g.impact}</div>`:''}
+        </div>`).join('')}
     </div>
-
     <div class="result-section">
       <div class="result-section-title">Governance Flags</div>
-      ${(a.governance_flags || []).map(f => {
-        const flag = typeof f === 'string' ? { flag: f, risk_level: 'medium' } : f
-        return `
-          <div class="flag-card">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:0.9rem">${flag.risk_level === 'high' ? '🔴' : flag.risk_level === 'medium' ? '🟡' : '🟢'}</span>
-              <span style="font-size:0.82rem">${flag.flag}</span>
-              ${flag.regulation ? `<span style="font-size:0.68rem;color:var(--accent);margin-left:auto">${flag.regulation}</span>` : ''}
-            </div>
-          </div>`
-      }).join('')}
-    </div>
-  `
+      ${(a.governance_flags||[]).map(f=>{
+        const flag = typeof f==='string' ? {flag:f,risk_level:'medium'} : f
+        return `<div class="flag-card">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span>${flag.risk_level==='high'?'🔴':flag.risk_level==='medium'?'🟡':'🟢'}</span>
+            <span style="font-size:0.8rem">${flag.flag}</span>
+            ${flag.regulation?`<span style="font-size:0.65rem;color:var(--amber);margin-left:auto">${flag.regulation}</span>`:''}
+          </div>
+        </div>`}).join('')}
+    </div>`
 }
 
-function renderActions(container) {
+function renderActions(c) {
   const a = state.analysis
-  container.innerHTML = `
+  c.innerHTML = `
     <div class="result-section">
       <div class="result-section-title">Recommended Next Steps</div>
-      ${(a.next_steps || []).map(s => `
+      ${(a.next_steps||[]).map(s=>`
         <div class="step-card">
           <div class="step-header">
-            <div class="step-num">${s.priority}</div>
+            <div class="step-num-badge">${s.priority}</div>
             <div class="step-action">${s.action}</div>
           </div>
           <div class="step-meta">
             <span class="step-tag">👤 ${s.owner}</span>
             <span class="step-tag">📅 ${s.timeframe}</span>
-            ${s.effort ? `<span class="step-tag">⚡ ${s.effort} effort</span>` : ''}
+            ${s.effort?`<span class="step-tag">⚡ ${s.effort} effort</span>`:''}
           </div>
-        </div>
-      `).join('')}
-    </div>
-  `
+        </div>`).join('')}
+    </div>`
 }
 
-function renderPlan(container) {
+function renderPlan(c) {
   if (!state.actionPlan) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <div class="empty-title">90-Day Plan</div>
-        <div class="empty-sub">Click "Generate 90-Day Plan" to create a detailed phased action plan.</div>
-        <button class="btn-primary" style="width:auto;padding:10px 24px;margin-top:8px" onclick="generate90Day()">Generate Now</button>
-      </div>`
+    c.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">90-Day Plan</div>
+      <div class="empty-sub">Click "Generate 90-Day Plan" to create a phased action plan.</div>
+      <button class="btn-primary" style="width:auto;padding:10px 22px;margin-top:8px" onclick="generate90Day()">Generate Now</button>
+    </div>`
     return
   }
-
   const p = state.actionPlan
-  container.innerHTML = `
-    ${p.vision ? `
-    <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);margin-bottom:20px;font-size:0.85rem;font-style:italic;color:var(--muted)">
-      🎯 <strong style="color:var(--text)">Vision:</strong> ${p.vision}
-    </div>` : ''}
-
-    ${(p.phases || []).map(ph => `
+  c.innerHTML = `
+    ${p.vision?`<div style="padding:14px;background:var(--green-ghost);border-radius:7px;border:1px solid var(--green-pale);margin-bottom:18px;font-size:0.83rem;font-style:italic;color:var(--muted)">
+      🎯 <strong style="color:var(--green-deep)">Vision:</strong> ${p.vision}</div>`:''}
+    ${(p.phases||[]).map(ph=>`
       <div class="phase-card">
         <div class="phase-header">
           <span class="phase-tag">${ph.phase}</span>
@@ -819,103 +842,79 @@ function renderPlan(container) {
           <span class="phase-theme">${ph.theme}</span>
         </div>
         <div class="phase-body">
-          ${(ph.actions || []).map(a => `
+          ${(ph.actions||[]).map(a=>`
             <div class="action-row">
               <div class="action-week">${a.week}</div>
               <div>
                 <div class="action-text">${a.action}</div>
-                ${a.deliverable ? `<div class="action-deliverable">→ ${a.deliverable}</div>` : ''}
+                ${a.deliverable?`<div class="action-deliverable">→ ${a.deliverable}</div>`:''}
               </div>
-            </div>
-          `).join('')}
+            </div>`).join('')}
         </div>
-      </div>
-    `).join('')}
-
-    ${p.success_metrics?.length ? `
+      </div>`).join('')}
+    ${p.success_metrics?.length?`
     <div class="result-section">
       <div class="result-section-title">Success Metrics</div>
-      <div class="pill-list">${p.success_metrics.map(m => `<div class="pill">📈 ${m}</div>`).join('')}</div>
-    </div>` : ''}
+      <div class="pill-list">${p.success_metrics.map(m=>`<div class="pill">📈 ${m}</div>`).join('')}</div>
+    </div>`:''}
   `
 }
 
-function renderChat(container) {
+function renderChat(c) {
   const hasAnalysis = !!state.analysis
   const suggestions = hasAnalysis ? [
-    "What's the single most important thing to fix first?",
-    "How long would this realistically take with a small team?",
-    "What tools would you recommend for our stack?",
+    "What's the most important thing to fix first?",
+    "How long realistically with a small team?",
+    "What tools would you recommend?",
     "What does good look like at 6 months?",
   ] : []
-
-  container.innerHTML = `
+  c.innerHTML = `
     <div class="chat-wrap">
       <div class="chat-messages" id="chat-messages">
         <div class="chat-msg assistant">
           ${hasAnalysis
-            ? `I've completed your data readiness assessment — score <strong>${state.analysis.readiness_score}/10 (${state.analysis.readiness_label})</strong>. What would you like to explore further?`
-            : `Run an assessment first, then I can answer specific questions about your situation.`
-          }
+            ? `Assessment complete — <strong>${state.analysis.readiness_score}/10 (${state.analysis.readiness_label})</strong>. What would you like to explore further?`
+            : `Run an assessment first, then ask me anything about your situation.`}
         </div>
-        ${state.chatHistory.filter(m => m.role !== 'system').map(m => `
-          <div class="chat-msg ${m.role}">${m.content}</div>
-        `).join('')}
+        ${state.chatHistory.map(m=>`<div class="chat-msg ${m.role}">${m.content}</div>`).join('')}
       </div>
-      ${suggestions.length ? `
-      <div class="suggest-chips">
-        ${suggestions.map(s => `<div class="suggest-chip" onclick="sendSuggestion('${s}')">${s}</div>`).join('')}
-      </div>` : ''}
+      ${suggestions.length?`<div class="suggest-chips">
+        ${suggestions.map(s=>`<div class="suggest-chip" onclick="sendSuggestion('${s}')">${s}</div>`).join('')}
+      </div>`:''}
       <div class="chat-input-wrap">
         <input class="chat-input" id="chat-input" placeholder="Ask a follow-up question..."
                onkeydown="if(event.key==='Enter')sendChat()">
         <button class="chat-send" id="chat-send" onclick="sendChat()">Send →</button>
       </div>
-    </div>
-  `
+    </div>`
   scrollChat()
 }
 
-function sendSuggestion(text) {
-  document.getElementById('chat-input').value = text
-  sendChat()
-}
+function sendSuggestion(t) { document.getElementById('chat-input').value=t; sendChat() }
 
 async function sendChat() {
   if (!state.analysis) { alert('Run an assessment first'); return }
   const input = document.getElementById('chat-input')
-  const msg   = input.value.trim()
-  if (!msg) return
-
+  const msg = input.value.trim(); if (!msg) return
   input.value = ''
-  state.chatHistory.push({ role: 'user', content: msg })
-
+  state.chatHistory.push({role:'user', content:msg})
   const send = document.getElementById('chat-send')
-  send.disabled    = true
-  send.textContent = '...'
-
-  renderChat(document.getElementById('result-content'))
-  scrollChat()
-
+  send.disabled=true; send.textContent='...'
+  renderChat(document.getElementById('result-content')); scrollChat()
   try {
     const res = await fetch('/api/chat', {
-      method:  'POST',
-      headers: {'Content-Type': 'application/json'},
-      body:    JSON.stringify({
-        message: msg,
-        context: state.analysis,
-        history: state.chatHistory.slice(0,-1),
-        domain:  state.domain,
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        message: msg, context: state.analysis,
+        history: state.chatHistory.slice(0,-1), domain: state.domain
       })
     })
     const data = await res.json()
-    state.chatHistory.push({ role: 'assistant', content: data.reply })
+    state.chatHistory.push({role:'assistant', content:data.reply})
   } catch(e) {
-    state.chatHistory.push({ role: 'assistant', content: 'Sorry, an error occurred. Please try again.' })
+    state.chatHistory.push({role:'assistant', content:'Sorry, an error occurred.'})
   }
-
-  renderChat(document.getElementById('result-content'))
-  scrollChat()
+  renderChat(document.getElementById('result-content')); scrollChat()
 }
 
 function scrollChat() {
