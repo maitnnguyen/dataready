@@ -1,12 +1,31 @@
 import os
 import json
+import shutil
 import httpx
-from fastapi import FastAPI, HTTPException
+from contextlib import asynccontextmanager
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Optional
 
-app = FastAPI(title="DataReady — AI Data Consulting", version="2.0.0")
+# RAG module: integrate to improve AI based consulting approach
+from rag import build_index, retrieve   
+
+# ── Lifespan: build RAG index on startup ─────────────────────────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await build_index()   # loads + embeds ./docs on startup; safe if empty
+    yield
+ 
+ 
+app = FastAPI(
+    title="DataReady — AI Data Consulting",
+    version="2.1.0",
+    lifespan=lifespan,
+)
+#app = FastAPI(title="DataReady — AI Data Consulting", version="2.0.0")
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
@@ -21,7 +40,7 @@ DOMAIN_PERSONAS = {
 bioinformatics pipelilnes, clinical trials, and real-world evidence. 
 Deep expertise in OMOP CDM, CDISC (SDTM/ADaM), FHIR R4, HL7, ICH E6/E8 guidelines. 
 Understand GxP data governance, 21 CFR Part 11, pharmacovigilance, and biomarker analysis 
-pipelines. You speak the language of CDOs, heads of data science, and clinical operations 
+pipelines. Using the language of CDOs, heads of data science, and clinical operations 
 leaders in life sciences.""",
 
     "healthcare": """Senior data & AI consultant specialising in healthcare 
@@ -34,13 +53,21 @@ data requirements.""",
     "finance": """Data & AI consultant specialising in financial 
 services data strategy. Deep expertise in data governance frameworks 
 (BCBS 239, DAMA-DMBOK), regulatory reporting (MiFID II, Basel III), risk data 
-aggregation, and ML model risk management. You understand the challenges of 
+aggregation, and ML model risk management. Understanding the challenges of 
 legacy core banking systems, data lineage, and model validation requirements.""",
 
+    "esg": """Incorporating GHG emissions measurement, ESG reporting, and decarbonisation strategy.
+Deep knowledge of GHG Protocol (Scope 1/2/3), TCFD, CSRD/ESRS E1, SBTi target
+setting, and CDP disclosure. Experienced in emissions data infrastructure —
+connecting ERP systems, utility data, and supply chain data into carbon accounting
+platforms. Aims to manage ESG risk, minimise net (zero) delivery. Focusing on direct,
+quantitative, and focused on actionable reduction pathways, not greenwashing.""",
+
     "general": """Senior data & AI consultant with 15+ years of experience 
-across multiple industries. You apply DAMA-DMBOK governance frameworks, have deep 
-knowledge of modern data stack architecture, MLOps, and organisational change 
-management. You are pragmatic, direct, and focused on actionable outcomes.""",
+across multiple industries. Apply DAMA-DMBOK governance frameworks, 
+have deep knowledge of modern data stack architecture (bronze - silver - gold), 
+MLOps, and organisational change management. You are pragmatic, direct, and focused 
+on actionable outcomes.""",
 }
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
@@ -48,7 +75,7 @@ class AnalysisRequest(BaseModel):
     problem:  str
     focus:    List[str]
     depth:    str                   # "quick" | "full"
-    domain:   str = "general"      # "biopharma" | "healthcare" | "finance" | "general"
+    domain:   str = "general"       # "biopharma" | "healthcare" | "finance" | "general"
 
 class ChatRequest(BaseModel):
     message:  str
@@ -174,10 +201,19 @@ async def analyse(req: AnalysisRequest):
 async def chat(req: ChatRequest):
     """
     Multi-turn follow-up conversation about the analysis.
-    User can ask follow-up questions, request clarification, or explore specific areas.
+    RAG-enhanced: pulls relevant context from ./docs based on domain.
     """
     persona = DOMAIN_PERSONAS.get(req.domain, DOMAIN_PERSONAS["general"])
-
+ 
+    # ── RAG: retrieve relevant knowledge base chunks ──────────────────────────
+    rag_context = await retrieve(req.message, domain=req.domain)
+    rag_block   = (
+        f"\n\nRELEVANT KNOWLEDGE BASE:\n{rag_context}\n\n"
+        "Use the above context to give specific, grounded answers where relevant. "
+        "If the context is not relevant to this question, ignore it."
+    ) if rag_context else ""
+ 
+    # ── System prompt: analysis context + RAG context + persona ──────────────
     system = f"""{persona}
 
 The client has received a data readiness assessment with the following results:
@@ -299,6 +335,54 @@ Be specific and actionable. No generic advice."""
     except Exception as e:
         raise HTTPException(status_code=502, detail="Failed to parse action plan")
 
+
+@app.post("/api/upload-doc")
+async def upload_doc(file: UploadFile = File(...)):
+    """
+    Upload a .md or .txt file to a domain folder and re-index.
+    URL param: /api/upload-doc?domain=biopharma
+    File is saved to ./docs/{domain}/{filename}
+    """
+    from fastapi import Query
+ 
+    allowed_ext = {".md", ".txt"}
+    ext = Path(file.filename).suffix.lower()
+    if ext not in allowed_ext:
+        raise HTTPException(400, f"Only .md and .txt files supported. Got: {ext}")
+ 
+    # derive domain from filename prefix e.g. "biopharma_cdisc.md" → biopharma
+    # or default to general
+    name_parts = file.filename.split("_", 1)
+    domain     = name_parts[0] if name_parts[0] in DOMAIN_PERSONAS else "general"
+ 
+    dest = DOCS_DIR / domain / file.filename
+    dest.parent.mkdir(parents=True, exist_ok=True)
+ 
+    with open(dest, "wb") as f:
+        shutil.copyfileobj(file.file, f)
+ 
+    # Re-build the in-memory index with the new file
+    await build_index()
+ 
+    return {
+        "status":  "ingested",
+        "file":    file.filename,
+        "domain":  domain,
+        "message": f"File saved to docs/{domain}/ and index rebuilt.",
+    }
+ 
+ 
+@app.get("/api/docs-index")
+async def docs_index():
+    """List all indexed documents and their domains. Useful for debugging."""
+    DOCS_DIR.mkdir(exist_ok=True)
+    files = []
+    for f in DOCS_DIR.glob("**/*"):
+        if f.suffix in {".md", ".txt"} and f.is_file():
+            domain = f.parent.name if f.parent != DOCS_DIR else "general"
+            files.append({"file": f.name, "domain": domain, "size_kb": round(f.stat().st_size / 1024, 1)})
+    return {"total": len(files), "files": files}
+ 
 
 @app.get("/api/health")
 async def health():
